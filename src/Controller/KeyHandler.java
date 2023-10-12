@@ -40,7 +40,7 @@ public class KeyHandler implements KeyListener, MouseListener {
             if(!cooldown && jumpCount > 0) {
                 System.out.println("aaaaaa");
                 this.player.velocityY = this.player.jumpForce;
-                this.player.posY -=3;
+                this.player.posY -=10;
                 upPressed = true;
                 cooldown = true;
                 jumpCount--;

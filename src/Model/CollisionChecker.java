@@ -13,19 +13,19 @@ public class CollisionChecker {
 
     public static void check(Player player, Tile tile){
         int size = Model.getInstance().size*2;
-//        if(player.velocityY < 0) {
-//            p1[0] = player.posX;
-//            p1[1] = player.posY;
-//            p2 = {player.posX + size, player.posY};
-//        }
-//        else{
-//            p1 = {player.posX, player.posY+size};
-//            p2 = {player.posX + size, player.posY+size};
-//        }
+
+        int TopPosY = player.posY;
+        int BottomPosY = player.posY+size;
+        int leftPosX = player.posX;
+        int rightPosX = player.posX + size;
+
 
         if(player.posY + player.velocityY + size >= tile.posY
                 && player.posX + player.velocityX + size >= tile.posX){
             player.collision = true;
+        }else{
+            player.collision = false;
+            System.out.println("not colliding");
         }
     }
 }

@@ -51,8 +51,7 @@ public class Model implements Runnable {
 
     private void keyHandle(){
         for(KeyHandler i: keyHList) {
-            if (i.player.posY >= 420) {
-                i.player.posY = 420;
+            if (i.player.posY >= 420 || i.player.collision) {
                 i.player.velocityY = 0;
                 i.jumpCount = 2;
             } else{
