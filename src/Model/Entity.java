@@ -4,8 +4,8 @@ public class Entity {
     public int posX;
     public int posY;
 
-    public int posXEnd;
-    public int PosYEnd;
+    public int width;
+    public int height;
     public int velocityX;
 
     public double velocityY;

@@ -20,7 +20,10 @@ public class Model implements Runnable {
 
     private static volatile Model INSTANCE = null;
 
-    Tile tile = new Tile(400,450,600,30,1);
+    CollisionChecker cChecker;
+
+    public TileManager tileManager;
+
 
 
     private Model() {
@@ -28,8 +31,24 @@ public class Model implements Runnable {
         modelThread.start();
         keyHList = new ArrayList<>();
         gameState = 0;
-        Tile.head.next = null;
-        Tile.add(400,450,600,30,1);
+
+        cChecker = new CollisionChecker(this);
+        tileManager = new TileManager(this);
+//        tileManager.add(400,100,3,1,true);
+//        tileManager.add(500,300,3,1,true);
+//        tileManager.add(600,200,3,1,true);
+        tileManager.add(0,size*19,30,1,true);
+        tileManager.add(100,size*16,3,1,true);
+        tileManager.add(200,size*13,3,1,true);
+        tileManager.add(300,size*10,3,1,true);
+        tileManager.add(400,size*7,3,1,true);
+        tileManager.add(500,size*4,3,1,true);
+
+
+
+        tileManager.addTiles();
+
+
     }
 
     public static Model getInstance() {
@@ -46,47 +65,6 @@ public class Model implements Runnable {
     public void addKeyHandler(KeyHandler keyH) {
         keyHList.add(keyH);
     }
-
-
-
-    private void keyHandle(){
-        for(KeyHandler i: keyHList) {
-            if (i.player.posY >= 420 || i.player.collision) {
-                i.player.velocityY = 0;
-                i.jumpCount = 2;
-            } else{
-//                if (i.gliding){
-//                    System.out.println("gliding");
-//                    i.player.velocityY+=0.5;
-//
-//                } else{
-//                    i.player.velocityY+=0.05;
-//                }
-                i.player.velocityY+=0.2;
-
-            }
-
-//            if(i.downPressed) {
-//                i.player.posY += i.player.velocityX;
-//            }
-            if(i.leftPressed) {
-                i.player.posX -= i.player.velocityX;
-            }
-            if(i.rightPressed) {
-                i.player.posX += i.player.velocityX;
-            }
-            i.player.posY += i.player.velocityY;
-            ;
-        }
-
-//
-//            if (checkForCollision(player1, player2)) {
-//                if(player1.getCooldown("cooldown") == 0 && player1.state == Player.State.VULNERABLE) {
-//                    player1.setCooldown((int)(tickRate*0.5));
-//                }
-//            }
-    }
-
 
 
     //game loop
@@ -121,11 +99,11 @@ public class Model implements Runnable {
     public void update() {
 
         try {
-            keyHandle();
+
             for(KeyHandler i: Model.getInstance().keyHList) {
+                cChecker.check(i.player);
                 i.player.routine();
-                CollisionChecker.check(keyHList.get(0).player, tile);
-            }
+                }
 
         } catch (Exception e) {
             e.printStackTrace();

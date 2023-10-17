@@ -3,21 +3,19 @@ package view;
 import Controller.KeyHandler;
 import Model.Model;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-
 import Model.Tile;
 
 public class GamePannel extends JPanel implements Runnable{
 
     Thread viewThread;
-    public static double FPS = 50;
+    public int FPS = 144;
 
-    final int maxScreenCol = 25;
-    final int maxScreenRow = 12;
+    public double animationFrameDuration = (double) FPS/10;
+
+    public final static int maxScreenCol = 30;
+    public final static int maxScreenRow = 25;
 
     final int screenWidth = Model.getInstance().size * maxScreenCol;
     final int screenHeight = Model.getInstance().size * maxScreenRow;
@@ -29,10 +27,10 @@ public class GamePannel extends JPanel implements Runnable{
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         this.setFocusable(true);
-        this.addKeyListener(keyH);
         startViewThread();
 
     }
+
 
     public void startViewThread() {
         viewThread = new Thread(this);
@@ -40,14 +38,14 @@ public class GamePannel extends JPanel implements Runnable{
     }
 
     private void drawTiles(Graphics2D g2) {
-        Tile curr = Tile.head;
         g2.setColor(Color.DARK_GRAY);
-        g2.fillRect(0,0,1000,1000);
+        g2.fillRect(0,0,maxScreenCol*Model.getInstance().size,1000);
 
-        while (curr!= null) {
-            g2.setColor(Color.WHITE);
-            g2.fillRect(curr.posX, curr.posY, curr.posXEnd, curr.PosYEnd);
-            curr = curr.next;
+        for (Tile tile : Model.getInstance().tileManager.tileList) {
+            if(tile!=null){
+                g2.setColor(Color.WHITE);
+                g2.drawRect(tile.posX, tile.posY, tile.width, tile.height);
+            }
         }
     }
 
@@ -97,16 +95,26 @@ public class GamePannel extends JPanel implements Runnable{
     public void update() {
     }
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
 
-        Graphics2D g2 = (Graphics2D)g;
         switch (Model.getInstance().gameState) {
+
             case 0:
+                super.paintComponent(g);
+
+                Graphics2D g2 = (Graphics2D)g;
+                g2.setColor(Color.DARK_GRAY);
+                g2.fillRect(0,0,maxScreenCol*Model.getInstance().size,1000);
+                int i;
                 drawTiles(g2);
 
-                for(KeyHandler i : Model.getInstance().keyHList) {
+                for(KeyHandler ii : Model.getInstance().keyHList) {
 
-                    i.player.draw(g2);
+                    ii.player.draw(g2);
+
+                    if(ii.player.displayHitbox){
+                        ii.player.drawHitbox(g2);
+                    }
+
                 }
 
                 break;

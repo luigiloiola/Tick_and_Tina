@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import Model.Player;
+import view.GamePannel;
 
 public class KeyHandler implements KeyListener, MouseListener {
 
@@ -15,14 +16,17 @@ public class KeyHandler implements KeyListener, MouseListener {
     public double[] cursorPos;
     public Player player;
 
-    public int jumpCount = 2;
 
     public boolean gliding = false;
 
-    public boolean cooldown = false;
+    public GamePannel gamePannel;
     public KeyHandler() {
         Model.getInstance().addKeyHandler(this);
-        player = new Player();
+        this.gamePannel = new GamePannel(this);
+        gamePannel.addKeyListener(this);
+        gamePannel.FPS = 144;
+        gamePannel.animationFrameDuration = (double) gamePannel.FPS/10;
+        player = new Player(gamePannel, this);
     }
 
     @Override
@@ -37,13 +41,9 @@ public class KeyHandler implements KeyListener, MouseListener {
             this.player.up = true;
             gliding = true;
 
-            if(!cooldown && jumpCount > 0) {
-                System.out.println("aaaaaa");
-                this.player.velocityY = this.player.jumpForce;
-                this.player.posY -=10;
+            if(!player.jumpCooldown && player.jumpCount > 0) {
                 upPressed = true;
-                cooldown = true;
-                jumpCount--;
+//                player.jumpCooldown = true;
             }
 
         }
@@ -53,12 +53,15 @@ public class KeyHandler implements KeyListener, MouseListener {
         }
         if(code == KeyEvent.VK_A) {
             leftPressed = true;
-            this.player.left = true;
+            player.left = true;
 
         }
         if(code == KeyEvent.VK_D) {
             rightPressed = true;
-            this.player.right = true;
+            player.right = true;
+        }
+        if(code == KeyEvent.VK_H) {
+            player.displayHitbox = !player.displayHitbox;
         }
 
     }
@@ -67,15 +70,14 @@ public class KeyHandler implements KeyListener, MouseListener {
     public void keyReleased(KeyEvent e) {
         int code = e.getKeyCode();
         if(code == KeyEvent.VK_W) {
-            cooldown = false;
+            player.jumpCooldown = false;
             upPressed = false;
-            gliding = false;
-            this.player.up = false;
-            System.out.println(cooldown);
+            player.up = false;
         }
         if(code == KeyEvent.VK_S) {
             downPressed= false;
             this.player.down = false;
+
         }
         if(code == KeyEvent.VK_A) {
             leftPressed = false;
@@ -83,18 +85,19 @@ public class KeyHandler implements KeyListener, MouseListener {
         }
         if(code == KeyEvent.VK_D) {
             rightPressed = false;
-            this.player.right = false;
+            player.right = false;
+            System.out.println(rightPressed);
         }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        cursorPos[0] = e.getX();
-        cursorPos[1]= e.getY();
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        cursorPos[0] = e.getX();
+        cursorPos[1]= e.getY();
 
     }
 

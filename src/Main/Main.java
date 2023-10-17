@@ -15,11 +15,9 @@ public class Main {
         window.setTitle("game");
 
         KeyHandler keyH1 = new KeyHandler();
-//        KeyHandler keyH2 = new KeyHandler();
+        KeyHandler keyH2 = new KeyHandler();
 
-
-        GamePannel gamePannel = new GamePannel(keyH1);
-        window.add(gamePannel);
+        window.add(keyH1.gamePannel);
 
         window.pack();
 
@@ -34,16 +32,14 @@ public class Main {
         window2.setTitle("game");
 
 
-//        GamePannel gamePannel2 = new GamePannel(keyH2);
-//        gamePannel2.FPS = 60;
-//        window2.add(gamePannel2);
-//
-//        window2.pack();
-//
-//
-//
-//        window2.setLocationRelativeTo(null);
-//        window2.setVisible(true);
+        window2.add(keyH2.gamePannel);
+
+        window2.pack();
+
+
+
+        window2.setLocationRelativeTo(null);
+        window2.setVisible(true);
 
 
     }
