@@ -13,9 +13,8 @@ import java.util.Map;
 
 public class Player extends Entity{
 
-    public enum State {VULNERABLE, IMUNE, DEBUFFED, BUFFED};
 
-    public boolean down, left, right, up = false;
+    public boolean down, left, right, up, dodgeAttacking = false;
     public boolean idle;
 
     public boolean airBorne = false;
@@ -25,31 +24,16 @@ public class Player extends Entity{
     public boolean colliding = false;
 
     BufferedImage airBornImage;
-    BufferedImage[] runningImages = new BufferedImage[5];
-    int runningFrame;
+    BufferedImage[] runningImages,runningImagesReversed, idleImages, jumpImages, jumpToFallImages, fallImages, dodgeAttackImages;
 
-    BufferedImage[] idleImages = new BufferedImage[6];
-    int idleFrame;
+    int runningFrame, idleFrame, jumpFrame, jumpToFallFrame, fallFrame, dodgeAttackFrame = 0;
 
-    BufferedImage[] standingImages = new BufferedImage[5];
-    int standingFrame;
+    boolean animatingJumpTransition = false;
 
-    BufferedImage[] standingImagesReversed = new BufferedImage[5];
-
-    BufferedImage[] runningImagesReversed = new BufferedImage[5];
-
-
-    File folder = new File("res/idle");
-    File[] listOfFiles = folder.listFiles();
-    BufferedImage[] idleImages2 = new BufferedImage[listOfFiles.length];
-
-
-    int idleCooldown;
 
     public boolean displayHitbox;
 
 
-    State state;
     private static int lastPlayerId = 0;
     public int playerId;
     private  int imuneDuration;
@@ -66,6 +50,8 @@ public class Player extends Entity{
     GamePannel gamePannel;
     KeyHandler keyH;
 
+    public int tempPosX;
+
 
     public Player(GamePannel gamePannel, KeyHandler keyH) {
         this.playerId = lastPlayerId;
@@ -77,14 +63,13 @@ public class Player extends Entity{
         this.velocityX = 2;
         this.velocityY = 0;
         this.cooldowns.put("cooldown", 0);
-        this.state = State.IMUNE;
+        this.animating = false;
         this.imuneDuration = 0;
         this.jumpForce = -6;
         this.glidingVelocity = -0.25;
-        this.idleCooldown = 0;
         this.idleFrame=0;
         this.runningFrame=0;
-        this.standingFrame = 0;
+        this.idleFrame = 0;
         this.gamePannel = gamePannel;
         this.keyH = keyH;
         getEntityImage();
@@ -94,168 +79,183 @@ public class Player extends Entity{
 
     public void getEntityImage() {
 
+        File folder = new File("res/run");
+        File[] listOfFiles = folder.listFiles();
 
-        try {
-            if(playerId == 0) {
-
-                int i = 0;
-                for (File file : listOfFiles) {
-                    if (file.isFile()) {
-                        idleImages2[i] = ImageIO.read(file);
-                    }
-                }
-                idleImages[0] = ImageIO.read(getClass().getResourceAsStream("/player/tile014.png"));
-                idleImages[1] = ImageIO.read(getClass().getResourceAsStream("/player/tile015.png"));
-                idleImages[2] = ImageIO.read(getClass().getResourceAsStream("/player/tile016.png"));
-                idleImages[3] = ImageIO.read(getClass().getResourceAsStream("/player/tile017.png"));
-                idleImages[4] = ImageIO.read(getClass().getResourceAsStream("/player/tile018.png"));
-                idleImages[5] = ImageIO.read(getClass().getResourceAsStream("/player/tile019.png"));
-
-                standingImages[0] = ImageIO.read(getClass().getResourceAsStream("/player/tile000.png"));
-                standingImages[1] = ImageIO.read(getClass().getResourceAsStream("/player/tile001.png"));
-                standingImages[2] = ImageIO.read(getClass().getResourceAsStream("/player/tile002.png"));
-                standingImages[3] = ImageIO.read(getClass().getResourceAsStream("/player/tile003.png"));
-                standingImages[4] = ImageIO.read(getClass().getResourceAsStream("/player/tile004.png"));
-
-                runningImages[0] = ImageIO.read(getClass().getResourceAsStream("/player/tile021.png"));
-                runningImages[1] = ImageIO.read(getClass().getResourceAsStream("/player/tile022.png"));
-                runningImages[2] = ImageIO.read(getClass().getResourceAsStream("/player/tile023.png"));
-                runningImages[3] = ImageIO.read(getClass().getResourceAsStream("/player/tile024.png"));
-                runningImages[4] = ImageIO.read(getClass().getResourceAsStream("/player/tile025.png"));
-
-                runningImagesReversed[0] = ImageIO.read(getClass().getResourceAsStream("/player-reversed/tile023.png"));
-                runningImagesReversed[1] = ImageIO.read(getClass().getResourceAsStream("/player-reversed/tile024.png"));
-                runningImagesReversed[2] = ImageIO.read(getClass().getResourceAsStream("/player-reversed/tile025.png"));
-                runningImagesReversed[3] = ImageIO.read(getClass().getResourceAsStream("/player-reversed/tile026.png"));
-                runningImagesReversed[4] = ImageIO.read(getClass().getResourceAsStream("/player-reversed/tile027.png"));
-
-            }else{
-                idleImages[0] = ImageIO.read(getClass().getResourceAsStream("/player2/tile014.png"));
-                idleImages[1] = ImageIO.read(getClass().getResourceAsStream("/player2/tile015.png"));
-                idleImages[2] = ImageIO.read(getClass().getResourceAsStream("/player2/tile016.png"));
-                idleImages[3] = ImageIO.read(getClass().getResourceAsStream("/player2/tile017.png"));
-                idleImages[4] = ImageIO.read(getClass().getResourceAsStream("/player2/tile018.png"));
-                idleImages[5] = ImageIO.read(getClass().getResourceAsStream("/player2/tile019.png"));
-
-                standingImages[0] = ImageIO.read(getClass().getResourceAsStream("/player2/tile000.png"));
-                standingImages[1] = ImageIO.read(getClass().getResourceAsStream("/player2/tile001.png"));
-                standingImages[2] = ImageIO.read(getClass().getResourceAsStream("/player2/tile002.png"));
-                standingImages[3] = ImageIO.read(getClass().getResourceAsStream("/player2/tile003.png"));
-                standingImages[4] = ImageIO.read(getClass().getResourceAsStream("/player2/tile004.png"));
-
-                runningImages[0] = ImageIO.read(getClass().getResourceAsStream("/player2/tile021.png"));
-                runningImages[1] = ImageIO.read(getClass().getResourceAsStream("/player2/tile022.png"));
-                runningImages[2] = ImageIO.read(getClass().getResourceAsStream("/player2/tile023.png"));
-                runningImages[3] = ImageIO.read(getClass().getResourceAsStream("/player2/tile024.png"));
-                runningImages[4] = ImageIO.read(getClass().getResourceAsStream("/player2/tile025.png"));
-
-                runningImagesReversed[0] = ImageIO.read(getClass().getResourceAsStream("/player2-reversed/tile023.png"));
-                runningImagesReversed[1] = ImageIO.read(getClass().getResourceAsStream("/player2-reversed/tile024.png"));
-                runningImagesReversed[2] = ImageIO.read(getClass().getResourceAsStream("/player2-reversed/tile025.png"));
-                runningImagesReversed[3] = ImageIO.read(getClass().getResourceAsStream("/player2-reversed/tile026.png"));
-                runningImagesReversed[4] = ImageIO.read(getClass().getResourceAsStream("/player2-reversed/tile027.png"));
-            }
+        runningImages = getImageFiles("res/run");
+        idleImages = getImageFiles("res/idle");
+        runningImagesReversed = getImageFiles("res/reversed/run");
+        jumpImages = getImageFiles("res/jump");
+        jumpToFallImages = getImageFiles("res/jump-to-fall");
+        fallImages = getImageFiles("res/fall");
+        dodgeAttackImages = getImageFiles("res/dodge-charge-attack");
 
 
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
+
+
+
     }
 
 
 
 //    this should e updateded by the Model not by the View
+
+    private BufferedImage[] getImageFiles(String pathName) {
+        File folder = new File(pathName);
+        File[] listOfFiles = folder.listFiles();
+        BufferedImage[] images = new BufferedImage[listOfFiles.length];
+
+        try{
+            int i = 0;
+            for (File file : listOfFiles) {
+                if (file.isFile()) {
+
+                        images[i] = ImageIO.read(file);
+                        i++;
+
+                }
+            }
+        }catch(IOException e) {
+            e.printStackTrace();
+        }
+        return images;
+    };
+
+    BufferedImage animate(BufferedImage[] imageList, int imageFrame) {
+        BufferedImage image;
+        if(imageFrame ==  (int) (imageList.length * gamePannel.animationFrameDuration)) {
+            imageFrame = 0;
+        }
+        image = imageList[(int) (imageFrame /gamePannel.animationFrameDuration)];
+        imageFrame++;
+        return image;
+    }
     public void draw (Graphics2D g2) {
         BufferedImage image;
-        image = standingImages[0];
-          //
+        image = idleImages[0];
 
-        if(left && !right) {
+
+//        multiplying and then dividing it back after the increment, makes so that the animation spends more time in each frame
+
+
+        if(dodgeAttacking) {
+
+            if(dodgeAttackFrame != (int)(dodgeAttackImages.length* gamePannel.animationFrameDuration)-1){
+                image=dodgeAttackImages[(int) (dodgeAttackFrame/ gamePannel.animationFrameDuration)];
+                dodgeAttackFrame++;
+                if(dodgeAttackFrame == (int) (dodgeAttackImages.length* gamePannel.animationFrameDuration)-2) animating = false;
+
+
+            }else{
+                animating = false;
+                dodgeAttacking = false;
+                dodgeAttackFrame = 0;
+            }
+        }
+
+        else if(velocityY < 0) {
+            jumpToFallFrame = 0;
+            if(jumpFrame ==  (int) (jumpImages.length * gamePannel.animationFrameDuration)) {
+                jumpFrame = 0;
+            }
+            image = jumpImages[(int) (jumpFrame /gamePannel.animationFrameDuration)];
+            jumpFrame++;
+
+        }
+        else if(velocityY > 0){
+
+            if(jumpToFallFrame != (int) (jumpToFallImages.length* gamePannel.animationFrameDuration)-1){
+                image=jumpToFallImages[(int)(jumpToFallFrame/ gamePannel.animationFrameDuration)];
+                jumpToFallFrame++;
+
+            }else{
+
+                if(fallFrame == (int)(fallImages.length * gamePannel.animationFrameDuration)){
+                        fallFrame = 0;
+                    }
+                    image = fallImages[(int)(fallFrame/gamePannel.animationFrameDuration)];
+                    fallFrame++;
+            }
+        }
+        else if(left && !right) {
 
             if(runningFrame == (int) (runningImages.length * gamePannel.animationFrameDuration)){
                 runningFrame = 0;
             }
             image = runningImagesReversed[(int)(runningFrame / gamePannel.animationFrameDuration)];
             runningFrame++;
-            idleCooldown=0;
-            idleFrame=0;
+
         }
         else if(right && !left) {
 
             if(runningFrame == (int) (runningImages.length * gamePannel.animationFrameDuration)){
                 runningFrame = 0;
             }
-            image = runningImages[(int) (runningFrame/ gamePannel.animationFrameDuration)];
+            image = runningImages[(int)(runningFrame/ gamePannel.animationFrameDuration)];
             runningFrame++;
-            idleCooldown = 0;
-            idleFrame = 0;
-        }
 
-        else if(up || down) {
-            idleCooldown = 0;
         }
-
         else {
-
-            if(idleCooldown > gamePannel.FPS*5) {
-                if(idleFrame != ((idleImages.length-1) * gamePannel.animationFrameDuration)) {
-                    idleFrame ++;
-                }
-                image = idleImages[ (int) (idleFrame/ gamePannel.animationFrameDuration)];
+            if(idleFrame ==  (int) (idleImages.length * gamePannel.animationFrameDuration)) {
+                idleFrame = 0;
             }
-
-            else{
-
-                if(standingFrame ==  (int) (standingImages.length * gamePannel.animationFrameDuration)) {
-                    standingFrame = 0;
-                }
-                image = standingImages[(int) (standingFrame/gamePannel.animationFrameDuration)];
-                standingFrame++;
-                idleCooldown++;
-            }
-
-
+            image = idleImages[(int) (idleFrame /gamePannel.animationFrameDuration)];
+            idleFrame++;
         }
-
-        g2.drawImage(image, posX-width/2, posY-height, width*2, height*2, null);
+//        colocar posX e posY em função do image.getWidht() e image.getHieght()
+        g2.drawImage(image, tempPosX-image.getWidth(), posY-height, image.getWidth()*Model.getInstance().scale, image.getHeight()*3, null);
     }
 
     public void routine() {
-        if(playerId == 1) {
+        if(!animating){
+            tempPosX = posX;
 
+            if(!airBorne) {
+                velocityY = 0;
+                jumpCount = 2;
+            }
+            if (keyH.upPressed && !jumpCooldown) {
+                velocityY = jumpForce;
+                jumpCooldown = true;
+                jumpCount--;
 
-        }
-        if(!airBorne) {
-            velocityY = 0;
-            jumpCount = 2;
-        }
-        if (keyH.upPressed && !jumpCooldown) {
-            velocityY = jumpForce;
-            jumpCooldown = true;
-            jumpCount--;
-
-        } else if(airBorne){
-//                if (i.gliding){
+            } else if(airBorne){
+//                if (gliding){
 //                    System.out.println("gliding");
-//                    i.player.velocityY+=0.5;
+//                    velocityY+=0.5;
 //
 //                } else{
 //                    i.player.velocityY+=0.05;
 //                }
-            velocityY+=0.2;
+                velocityY+=0.12;
 
+            }
+
+            if(keyH.leftPressed && !colliding) {
+                posX -= velocityX;
+
+            }
+            if(keyH.rightPressed && !colliding) {
+                posX += velocityX;
+            }
+        }
+        else{
+            velocityY = 0;
+            if(dodgeAttacking){
+                switch ((int)(dodgeAttackFrame/ gamePannel.animationFrameDuration)){
+                    case 4:
+                        posX = tempPosX-34*Model.getInstance().scale;
+                        break;
+                    case 9:
+                        posX = tempPosX+30*Model.getInstance().scale;
+                        break;
+                    case 14:
+                        posX = tempPosX+34*Model.getInstance().scale;
+                        break;
+                }
+            }
         }
 
-//            if(i.downPressed) {
-//                i.player.posY += i.player.velocityX;
-//            }
-        if(keyH.leftPressed && !colliding) {
-            posX -= velocityX;
-
-        }
-        if(keyH.rightPressed && !colliding) {
-            posX += velocityX;
-        }
         posY += velocityY;
 
     }

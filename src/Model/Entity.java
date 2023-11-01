@@ -10,5 +10,7 @@ public class Entity {
 
     public double velocityY;
 
+    public boolean animating;
+
 
 }

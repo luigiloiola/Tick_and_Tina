@@ -35,7 +35,10 @@ public class CollisionChecker {
             if(tile != null){
 //playerBottom >= tile.posY && playerRight >= tile.posX && playerLeft >= tile.posX*tile.width
 
-                if (playerBottom >= tile.posY && playerBottom <= tile.posY+player.velocityY && playerRight >= tile.posX && playerLeft <= tile.posX+tile.width) {
+                if (playerBottom >= tile.posY
+                        && playerBottom <= tile.posY+player.velocityY
+                        && playerRight >= tile.posX
+                        && playerLeft <= tile.posX+tile.width) {
                     if(playerBottom> tile.posY){
                         player.posY = tile.posY- player.height;
                     }

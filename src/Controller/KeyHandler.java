@@ -12,7 +12,7 @@ import view.GamePannel;
 
 public class KeyHandler implements KeyListener, MouseListener {
 
-    public boolean upPressed, downPressed, leftPressed, rightPressed, shooting;
+    public boolean upPressed, downPressed, leftPressed, rightPressed, shiftPressed;
     public double[] cursorPos;
     public Player player;
 
@@ -25,7 +25,6 @@ public class KeyHandler implements KeyListener, MouseListener {
         this.gamePannel = new GamePannel(this);
         gamePannel.addKeyListener(this);
         gamePannel.FPS = 144;
-        gamePannel.animationFrameDuration = (double) gamePannel.FPS/10;
         player = new Player(gamePannel, this);
     }
 
@@ -37,13 +36,17 @@ public class KeyHandler implements KeyListener, MouseListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
+        if(code == KeyEvent.VK_SHIFT){
+            this.player.animating = true;
+            this.player.dodgeAttacking = true;
+
+        }
         if (code == KeyEvent.VK_W) {
             this.player.up = true;
             gliding = true;
 
             if(!player.jumpCooldown && player.jumpCount > 0) {
                 upPressed = true;
-//                player.jumpCooldown = true;
             }
 
         }
@@ -69,6 +72,11 @@ public class KeyHandler implements KeyListener, MouseListener {
     @Override
     public void keyReleased(KeyEvent e) {
         int code = e.getKeyCode();
+
+        if(code == KeyEvent.VK_SHIFT){
+            shiftPressed=false;
+        }
+
         if(code == KeyEvent.VK_W) {
             player.jumpCooldown = false;
             upPressed = false;
@@ -86,7 +94,6 @@ public class KeyHandler implements KeyListener, MouseListener {
         if(code == KeyEvent.VK_D) {
             rightPressed = false;
             player.right = false;
-            System.out.println(rightPressed);
         }
     }
 

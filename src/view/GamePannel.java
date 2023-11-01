@@ -5,14 +5,13 @@ import Model.Model;
 
 import javax.swing.*;
 import java.awt.*;
-import Model.Tile;
 
 public class GamePannel extends JPanel implements Runnable{
 
     Thread viewThread;
     public int FPS = 144;
 
-    public double animationFrameDuration = (double) FPS/10;
+    public double animationFrameDuration = (double) FPS/6;
 
     public final static int maxScreenCol = 30;
     public final static int maxScreenRow = 25;
@@ -37,20 +36,7 @@ public class GamePannel extends JPanel implements Runnable{
         viewThread.start();
     }
 
-    private void drawTiles(Graphics2D g2) {
-        g2.setColor(Color.DARK_GRAY);
-        g2.fillRect(0,0,maxScreenCol*Model.getInstance().size,1000);
 
-        for (Tile tile : Model.getInstance().tileManager.tileList) {
-            if(tile!=null){
-                g2.setColor(Color.WHITE);
-                g2.drawRect(tile.posX, tile.posY, tile.width, tile.height);
-            }
-        }
-    }
-
-    private void drawPlayer(Graphics2D g2) {
-    }
 
     @Override
     public void run() {
@@ -105,7 +91,7 @@ public class GamePannel extends JPanel implements Runnable{
                 g2.setColor(Color.DARK_GRAY);
                 g2.fillRect(0,0,maxScreenCol*Model.getInstance().size,1000);
                 int i;
-                drawTiles(g2);
+                Model.getInstance().tileManager.draw(g2);
 
                 for(KeyHandler ii : Model.getInstance().keyHList) {
 

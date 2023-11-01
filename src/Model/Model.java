@@ -1,6 +1,7 @@
 package Model;
 
 import Controller.KeyHandler;
+import view.GamePannel;
 
 import java.util.ArrayList;
 
@@ -34,19 +35,30 @@ public class Model implements Runnable {
 
         cChecker = new CollisionChecker(this);
         tileManager = new TileManager(this);
-//        tileManager.add(400,100,3,1,true);
-//        tileManager.add(500,300,3,1,true);
-//        tileManager.add(600,200,3,1,true);
-        tileManager.add(0,size*19,30,1,true);
-        tileManager.add(100,size*16,3,1,true);
-        tileManager.add(200,size*13,3,1,true);
-        tileManager.add(300,size*10,3,1,true);
-        tileManager.add(400,size*7,3,1,true);
-        tileManager.add(500,size*4,3,1,true);
+
+        tileManager.add(0,size*19,1500, 200);
+        tileManager.add(300,size*19,"ground");
+        tileManager.add(650,size*19,"ground");
+        tileManager.add(850,size*19,"ground");
+        tileManager.add(1000,size*19,"ground");
+//        tileManager.add(0,0,"wall left");
+//        tileManager.add(0,335,"wall left");
+        tileManager.add(300,630,"wall left");
+        tileManager.add(1000,size*19,"ground");
+        tileManager.add(-45,size*19-tileManager.wallLeft.getHeight()*scale+size,"ground");
+
+
+        tileManager.add((GamePannel.maxScreenCol-1)*size,0,"wall right");
+        tileManager.add((GamePannel.maxScreenCol-1)*size,335,"wall right");
+        tileManager.add((GamePannel.maxScreenCol-1)*size,630,"wall right");
+
+        tileManager.add(730-tileManager.platform.getWidth()*scale, 650, "platform");
+        tileManager.add(570+tileManager.platform.getWidth()*scale, 650, "platform");
+        tileManager.add(650, 650, "platform blud");
+        tileManager.add(650,650-tileManager.treeBlud.getHeight()*scale,"tree blud");
 
 
 
-        tileManager.addTiles();
 
 
     }
