@@ -48,6 +48,7 @@ public class CollisionChecker {
                 if(playerRight > tile.posX && playerLeft < tile.posX+tile.width && playerTop + player.velocityY <= tile.posY+tile.height && playerTop + player.velocityY >= tile.posY){
                     player.posY = tile.posY+tile.height+1;
                     player.velocityY = 0;
+
                     System.out.println("colliding top");
                 }
                 if(playerRight >= tile.posX && playerLeft <= tile.posX+tile.width && playerBottom > tile.posY && playerTop < tile.posY+tile.height){
