@@ -2,6 +2,7 @@
 package Main;
 
 import Controller.KeyHandler;
+import Model.Model;
 import view.GamePannel;
 
 import javax.swing.*;
@@ -16,7 +17,7 @@ public class Main {
 
         KeyHandler keyH1 = new KeyHandler();
         KeyHandler keyH2 = new KeyHandler();
-
+        Model.getInstance().modelThread.start();
         window.add(keyH1.gamePannel);
 
         window.pack();

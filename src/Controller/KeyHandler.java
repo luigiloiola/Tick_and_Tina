@@ -26,6 +26,7 @@ public class KeyHandler implements KeyListener, MouseListener {
         gamePannel.addKeyListener(this);
         gamePannel.FPS = 144;
         player = new Player(gamePannel, this);
+        System.out.println(player);
     }
 
     @Override

@@ -54,6 +54,7 @@ public class Player extends Entity{
 
 
     public Player(GamePannel gamePannel, KeyHandler keyH) {
+        System.out.println("player created");
         this.playerId = lastPlayerId;
         lastPlayerId +=1;
         this.height = Model.getInstance().size;
@@ -79,9 +80,6 @@ public class Player extends Entity{
 
     public void getEntityImage() {
 
-        File folder = new File("res/run");
-        File[] listOfFiles = folder.listFiles();
-
         runningImages = getImageFiles("res/run");
         idleImages = getImageFiles("res/idle");
         runningImagesReversed = getImageFiles("res/reversed/run");
@@ -89,20 +87,17 @@ public class Player extends Entity{
         jumpToFallImages = getImageFiles("res/jump-to-fall");
         fallImages = getImageFiles("res/fall");
         dodgeAttackImages = getImageFiles("res/dodge-charge-attack");
-
-
-
-
-
     }
 
 
 
-//    this should e updateded by the Model not by the View
+//    this should be updated by the Model not by the View
 
     private BufferedImage[] getImageFiles(String pathName) {
+
         File folder = new File(pathName);
         File[] listOfFiles = folder.listFiles();
+        System.out.println(listOfFiles);
         BufferedImage[] images = new BufferedImage[listOfFiles.length];
 
         try{

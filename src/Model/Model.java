@@ -29,7 +29,6 @@ public class Model implements Runnable {
 
     private Model() {
         modelThread = new Thread(this);
-        modelThread.start();
         keyHList = new ArrayList<>();
         gameState = 0;
 
