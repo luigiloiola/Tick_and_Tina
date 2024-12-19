@@ -16,7 +16,7 @@ public class Main {
         window.setTitle("game");
 
         KeyHandler keyH1 = new KeyHandler();
-        KeyHandler keyH2 = new KeyHandler();
+//        KeyHandler keyH2 = new KeyHandler();
         Model.getInstance().modelThread.start();
         window.add(keyH1.gamePannel);
 
@@ -26,22 +26,21 @@ public class Main {
 
         window.setLocationRelativeTo(null);
         window.setVisible(true);
-
-        JFrame window2 = new JFrame();
-        window2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window2.setResizable(false);
-        window2.setTitle("game");
-
-
-        window2.add(keyH2.gamePannel);
-
-        window2.pack();
-
-
-
-        window2.setLocationRelativeTo(null);
-        window2.setVisible(true);
-
-
+//
+//        JFrame window2 = new JFrame();
+//        window2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        window2.setResizable(false);
+//        window2.setTitle("game");
+//
+//
+//        window2.add(keyH2.gamePannel);
+//
+//        window2.pack();
+//
+//
+//
+//        window2.setLocationRelativeTo(null);
+//        window2.setVisible(true);
+//
     }
 }

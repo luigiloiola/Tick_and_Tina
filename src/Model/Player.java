@@ -17,11 +17,11 @@ public class Player extends Entity{
     public boolean down, left, right, up, dodgeAttacking = false;
     public boolean idle;
 
-    public boolean airBorne = false;
     public boolean yDrection = true;
     public boolean xDirection = true;
 
-    public boolean colliding = false;
+    public boolean[] colliding = {false, false, false, false};
+    public boolean airBorne = !this.colliding[0];
 
     BufferedImage airBornImage;
     BufferedImage[] runningImages,runningImagesReversed, idleImages, jumpImages, jumpToFallImages, fallImages, dodgeAttackImages;
@@ -43,6 +43,7 @@ public class Player extends Entity{
     public int jumpForce;
 
     public int jumpCount = 2;
+    public boolean dodgeAvaliable;
 
     public boolean jumpCooldown = false;
     private final Map<String, Integer> cooldowns = new HashMap<>();
@@ -62,7 +63,7 @@ public class Player extends Entity{
         this.posX = Model.getInstance().size + Model.getInstance().size*playerId;
         this.posY = 0;
         this.velocityX = 2;
-        this.velocityY = 0;
+        this.velocityY = -0.1;
         this.cooldowns.put("cooldown", 0);
         this.animating = false;
         this.imuneDuration = 0;
@@ -73,6 +74,7 @@ public class Player extends Entity{
         this.idleFrame = 0;
         this.gamePannel = gamePannel;
         this.keyH = keyH;
+        this.dodgeAvaliable = true;
         getEntityImage();
 
     }
@@ -134,10 +136,9 @@ public class Player extends Entity{
 
 
         if(dodgeAttacking) {
-
-            if(dodgeAttackFrame != (int)(dodgeAttackImages.length* gamePannel.animationFrameDuration)-1){
+            if(dodgeAttackFrame != (int)(dodgeAttackImages.length* gamePannel.animationFrameDuration)){
                 image=dodgeAttackImages[(int) (dodgeAttackFrame/ gamePannel.animationFrameDuration)];
-                dodgeAttackFrame++;
+                dodgeAttackFrame+=2;
                 if(dodgeAttackFrame == (int) (dodgeAttackImages.length* gamePannel.animationFrameDuration)-2) animating = false;
 
 
@@ -148,7 +149,7 @@ public class Player extends Entity{
             }
         }
 
-        else if(velocityY < 0) {
+        else if(velocityY < 0 && !colliding[1]) {
             jumpToFallFrame = 0;
             if(jumpFrame ==  (int) (jumpImages.length * gamePannel.animationFrameDuration)) {
                 jumpFrame = 0;
@@ -157,7 +158,7 @@ public class Player extends Entity{
             jumpFrame++;
 
         }
-        else if(velocityY > 0){
+        else if(velocityY > 0 && !colliding[1]) {
 
             if(jumpToFallFrame != (int) (jumpToFallImages.length* gamePannel.animationFrameDuration)-1){
                 image=jumpToFallImages[(int)(jumpToFallFrame/ gamePannel.animationFrameDuration)];
@@ -205,38 +206,46 @@ public class Player extends Entity{
         if(!animating){
             tempPosX = posX;
 
-            if(!airBorne) {
-                velocityY = 0;
+            if(!colliding[1]) {
+                posY += velocityY;
+                velocityY+=0.12;
+            }else{
                 jumpCount = 2;
+                dodgeAvaliable = true;
+                velocityY = 0.12;
             }
             if (keyH.upPressed && !jumpCooldown) {
                 velocityY = jumpForce;
-                jumpCooldown = true;
-                jumpCount--;
-
-            } else if(airBorne){
-//                if (gliding){
-//                    System.out.println("gliding");
-//                    velocityY+=0.5;
-//
-//                } else{
-//                    i.player.velocityY+=0.05;
-//                }
-                velocityY+=0.12;
+                if(!colliding[0]){
+                    jumpCooldown = true;
+                    jumpCount--;
+                }
 
             }
-
-            if(keyH.leftPressed && !colliding) {
-                posX -= velocityX;
-
+            if(keyH.leftPressed) {
+                if(velocityX > 0){
+                    velocityX = velocityX * -1;
+                }
+                if(!colliding[2]){
+                    posX += velocityX;
+                }
             }
-            if(keyH.rightPressed && !colliding) {
-                posX += velocityX;
+            if(keyH.rightPressed) {
+                if(velocityX < 0){
+                    velocityX = velocityX * -1;
+                }
+                if(!colliding[3]){
+                    posX += velocityX;
+                }
+            }
+            if(keyH.shiftPressed && dodgeAvaliable) {
+                animating = true;
+                dodgeAttacking = true;
             }
         }
         else{
             velocityY = 0;
-            if(dodgeAttacking){
+            if( dodgeAttacking ) {
                 switch ((int)(dodgeAttackFrame/ gamePannel.animationFrameDuration)){
                     case 4:
                         posX = tempPosX-34*Model.getInstance().scale;
@@ -248,11 +257,9 @@ public class Player extends Entity{
                         posX = tempPosX+34*Model.getInstance().scale;
                         break;
                 }
+                dodgeAvaliable = false;
             }
         }
-
-        posY += velocityY;
-
     }
 
     public void drawHitbox(Graphics2D g2) {

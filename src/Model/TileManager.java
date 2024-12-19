@@ -21,6 +21,8 @@ public class TileManager{
     public Tile[] sceneryTileList = new Tile[20];
     public int lastSceneryTile = 0;
 
+    public boolean showHitbox = false;
+
 
     BufferedImage wallRight, wallLeft, ground, platform, platformBlud, longPlatform, longPlatformBlud, treeBlud;
 
@@ -79,7 +81,6 @@ public class TileManager{
                 sceneryTileList[lastSceneryTile] = new Tile(posX, posY, treeBlud.getWidth()* model.scale, treeBlud.getHeight()*model.scale, "tree blud");
                 lastSceneryTile++;
                 break;
-
         }
     }
 
@@ -141,6 +142,10 @@ public class TileManager{
                         default:
                             g2.setColor(new Color(30,30,30));
                             g2.fillRect(tile.posX, tile.posY, tile.width, tile.height);
+                    }
+                    if (this.showHitbox) {
+                        g2.setColor(Color.BLUE);
+                        g2.drawRect(tile.posX, tile.posY, tile.width, tile.height);
                     }
                 }
             }

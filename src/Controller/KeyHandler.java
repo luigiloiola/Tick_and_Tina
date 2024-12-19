@@ -38,9 +38,8 @@ public class KeyHandler implements KeyListener, MouseListener {
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
         if(code == KeyEvent.VK_SHIFT){
-            this.player.animating = true;
-            this.player.dodgeAttacking = true;
-
+            System.out.println("dodge");
+            shiftPressed = true;
         }
         if (code == KeyEvent.VK_W) {
             this.player.up = true;
@@ -66,6 +65,7 @@ public class KeyHandler implements KeyListener, MouseListener {
         }
         if(code == KeyEvent.VK_H) {
             player.displayHitbox = !player.displayHitbox;
+            Model.getInstance().tileManager.showHitbox = !Model.getInstance().tileManager.showHitbox;
         }
 
     }

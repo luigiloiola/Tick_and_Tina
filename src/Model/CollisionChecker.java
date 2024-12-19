@@ -10,6 +10,10 @@ public class CollisionChecker {
     int playerBottom;
     int playerLeft;
     int playerRight ;
+    int tileTop;
+    int tileBottom;
+    int tileLeft;
+    int tileRight;
 
     public CollisionChecker(Model model){
         this.model = model;
@@ -24,45 +28,43 @@ public class CollisionChecker {
         playerBottom = player.posY+player.height;
         playerLeft = player.posX;
         playerRight = player.posX + player.width;
-
-//        int topRow = topPosY/Model.getInstance().size;
-//        int bottomRow = bottomPosY/Model.getInstance().size;
-//        int leftCol = leftPosX/Model.getInstance().size;
-//        int rightCol = rightPosX/Model.getInstance().size;
-        player.airBorne = true;
-        player.colliding = false;
+        player.colliding[0] = false;
+        player.colliding[1] = false;
+        player.colliding[2] = false;
+        player.colliding[3] = false;
         for (Tile tile: Model.getInstance().tileManager.tileList) {
+
             if(tile != null){
-//playerBottom >= tile.posY && playerRight >= tile.posX && playerLeft >= tile.posX*tile.width
+                tileTop = tile.posY;
+                tileBottom = tile.posY+tile.height;
+                tileLeft = tile.posX;
+                tileRight = tile.posX+tile.width;
 
-                if (playerBottom >= tile.posY
-                        && playerBottom <= tile.posY+player.velocityY
-                        && playerRight >= tile.posX
-                        && playerLeft <= tile.posX+tile.width) {
-                    if(playerBottom> tile.posY){
-                        player.posY = tile.posY- player.height;
+                if(playerRight >= tileLeft && playerLeft <= tileRight){
+                    if( playerTop >= tileBottom && playerTop + player.velocityY <= tileBottom) {
+                        player.posY = tileBottom;
+                        player.colliding[0]= true;
+                        player.velocityY = 0;
                     }
-                    player.airBorne = false;
+                    if(playerBottom <= tileTop && playerBottom + player.velocityY >= tileTop){
+                        player.colliding[1] = true;
+                        player.posY = tileTop - player.height;
+                    }
                 }
-//                && playerTop >= tile.posY+ tile.height+player.velocityY
-                if(playerRight > tile.posX && playerLeft < tile.posX+tile.width && playerTop + player.velocityY <= tile.posY+tile.height && playerTop + player.velocityY >= tile.posY){
-                    player.posY = tile.posY+tile.height+1;
-                    player.velocityY = 0;
 
-                    System.out.println("colliding top");
-                }
-                if(playerRight >= tile.posX && playerLeft <= tile.posX+tile.width && playerBottom > tile.posY && playerTop < tile.posY+tile.height){
-                    player.colliding = true;
+                if ((playerBottom >= tileTop && playerTop <= tileBottom)){
+                    if( playerLeft >= tileRight && playerLeft + player.velocityX <= tileRight){
+                        player.colliding[2] = true;
+                        player.posX = tileRight;
+                    }
+                    if( playerRight <= tileLeft && playerRight + player.velocityX >= tileLeft){
+                        player.colliding[3] = true;
+                        player.posX = tileLeft - player.width;
+                    }
                 }
             }
 
         }
-
-
-
-
-
-
 
     }
 }
