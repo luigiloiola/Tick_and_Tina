@@ -3,40 +3,28 @@ package Model;
 import Controller.KeyHandler;
 import view.GamePannel;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Player extends Entity{
 
 
-    public boolean down, left, right, up, dodgeAttacking = false;
-    public boolean idle;
-
-    public boolean yDrection = true;
-    public boolean xDirection = true;
+    public boolean down, left, right, up, basic, charge, skill = false;
 
     public boolean[] colliding = {false, false, false, false};
-    public boolean airBorne = !this.colliding[0];
 
-    BufferedImage airBornImage;
-    BufferedImage[] runningImages,runningImagesReversed, idleImages, jumpImages, jumpToFallImages, fallImages, dodgeAttackImages;
 
-    int runningFrame, idleFrame, jumpFrame, jumpToFallFrame, fallFrame, dodgeAttackFrame = 0;
+    int runningFrame, idleFrame, jumpFrame, jumpToFallFrame, fallFrame, skillFrame = 0;
 
-    boolean animatingJumpTransition = false;
-
+    BufferedImage[] runningImages,runningImagesReversed, idleImages, jumpImages, jumpToFallImages, fallImages, skillImages;
 
     public boolean displayHitbox;
 
 
     private static int lastPlayerId = 0;
     public int playerId;
-    private  int imuneDuration;
 
     public double glidingVelocity;
 
@@ -51,29 +39,29 @@ public class Player extends Entity{
     GamePannel gamePannel;
     KeyHandler keyH;
 
-    public int tempPosX;
+    Character character;
 
+    //TODO: everything Player class is doing, should be done by Character class
 
-    public Player(GamePannel gamePannel, KeyHandler keyH) {
+    public Player(Character character) {
+        this.character = character;
+        this.gamePannel = character.gamePannel;
+        this.keyH = character.keyH;
         System.out.println("player created");
         this.playerId = lastPlayerId;
         lastPlayerId +=1;
         this.height = Model.getInstance().size;
         this.width = Model.getInstance().size;
-        this.posX = Model.getInstance().size + Model.getInstance().size*playerId;
-        this.posY = 0;
+        this.posX = character.posX;
+        this.posY = character.posY;
         this.velocityX = 2;
         this.velocityY = -0.1;
         this.cooldowns.put("cooldown", 0);
         this.animating = false;
-        this.imuneDuration = 0;
         this.jumpForce = -6;
         this.glidingVelocity = -0.25;
-        this.idleFrame=0;
         this.runningFrame=0;
         this.idleFrame = 0;
-        this.gamePannel = gamePannel;
-        this.keyH = keyH;
         this.dodgeAvaliable = true;
         getEntityImage();
 
@@ -82,41 +70,17 @@ public class Player extends Entity{
 
     public void getEntityImage() {
 
-        runningImages = getImageFiles("res/run");
-        idleImages = getImageFiles("res/idle");
-        runningImagesReversed = getImageFiles("res/reversed/run");
-        jumpImages = getImageFiles("res/jump");
-        jumpToFallImages = getImageFiles("res/jump-to-fall");
-        fallImages = getImageFiles("res/fall");
-        dodgeAttackImages = getImageFiles("res/dodge-charge-attack");
+        runningImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/run");
+        idleImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/idle");
+        jumpImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/jump");
+        jumpToFallImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/jumpToFall");
+        fallImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/fall");
+        skillImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/skill");
     }
 
 
 
-//    this should be updated by the Model not by the View
-
-    private BufferedImage[] getImageFiles(String pathName) {
-
-        File folder = new File(pathName);
-        File[] listOfFiles = folder.listFiles();
-        System.out.println(listOfFiles);
-        BufferedImage[] images = new BufferedImage[listOfFiles.length];
-
-        try{
-            int i = 0;
-            for (File file : listOfFiles) {
-                if (file.isFile()) {
-
-                        images[i] = ImageIO.read(file);
-                        i++;
-
-                }
-            }
-        }catch(IOException e) {
-            e.printStackTrace();
-        }
-        return images;
-    };
+//    TODO: this should be updated by the Model not by the View
 
     BufferedImage animate(BufferedImage[] imageList, int imageFrame) {
         BufferedImage image;
@@ -134,18 +98,21 @@ public class Player extends Entity{
 
 //        multiplying and then dividing it back after the increment, makes so that the animation spends more time in each frame
 
+        if (keyH.devTools) {
+            displayHitbox = true;
+        }
 
-        if(dodgeAttacking) {
-            if(dodgeAttackFrame != (int)(dodgeAttackImages.length* gamePannel.animationFrameDuration)){
-                image=dodgeAttackImages[(int) (dodgeAttackFrame/ gamePannel.animationFrameDuration)];
-                dodgeAttackFrame+=2;
-                if(dodgeAttackFrame == (int) (dodgeAttackImages.length* gamePannel.animationFrameDuration)-2) animating = false;
+        if(skill) {
+            if(skillFrame != (int)(skillImages.length* character.skillAnimamationFramesPerStep)){
+                image= skillImages[(int) (skillFrame / character.skillAnimamationFramesPerStep)];
+                skillFrame ++;
+                if(skillFrame == (int) (skillImages.length* character.skillAnimamationFramesPerStep)-2) animating = false;
 
 
             }else{
                 animating = false;
-                dodgeAttacking = false;
-                dodgeAttackFrame = 0;
+                skill = false;
+                skillFrame = 0;
             }
         }
 
@@ -173,7 +140,7 @@ public class Player extends Entity{
                     fallFrame++;
             }
         }
-        else if(left && !right) {
+        else if(keyH.leftPressed && !keyH.rightPressed) {
 
             if(runningFrame == (int) (runningImages.length * gamePannel.animationFrameDuration)){
                 runningFrame = 0;
@@ -182,7 +149,7 @@ public class Player extends Entity{
             runningFrame++;
 
         }
-        else if(right && !left) {
+        else if(keyH.rightPressed && !keyH.leftPressed) {
 
             if(runningFrame == (int) (runningImages.length * gamePannel.animationFrameDuration)){
                 runningFrame = 0;
@@ -192,13 +159,13 @@ public class Player extends Entity{
 
         }
         else {
-            if(idleFrame ==  (int) (idleImages.length * gamePannel.animationFrameDuration)) {
-                idleFrame = 0;
-            }
+//            if(idleFrame ==  (int) (idleImages.length * gamePannel.animationFrameDuration)) {
+//                idleFrame = 0;
+//            }
             image = idleImages[(int) (idleFrame /gamePannel.animationFrameDuration)];
-            idleFrame++;
+//            idleFrame++;
         }
-//        colocar posX e posY em função do image.getWidht() e image.getHieght()
+//        TODO: colocar posX e posY em função do image.getWidht() e image.getHieght()
         g2.drawImage(image, tempPosX-image.getWidth(), posY-height, image.getWidth()*Model.getInstance().scale, image.getHeight()*3, null);
     }
 
@@ -239,26 +206,18 @@ public class Player extends Entity{
                 }
             }
             if(keyH.shiftPressed && dodgeAvaliable) {
+                skill = true;
                 animating = true;
-                dodgeAttacking = true;
+                character.skill();
             }
-        }
-        else{
-            velocityY = 0;
-            if( dodgeAttacking ) {
-                switch ((int)(dodgeAttackFrame/ gamePannel.animationFrameDuration)){
-                    case 4:
-                        posX = tempPosX-34*Model.getInstance().scale;
-                        break;
-                    case 9:
-                        posX = tempPosX+30*Model.getInstance().scale;
-                        break;
-                    case 14:
-                        posX = tempPosX+34*Model.getInstance().scale;
-                        break;
-                }
-                dodgeAvaliable = false;
+            if(keyH.mouseRight){
+                basic = true;
             }
+
+        }else{
+            if (skill) character.skill();
+            if (basic) character.basic();
+            if (charge) character.charge();
         }
     }
 

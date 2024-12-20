@@ -2,6 +2,7 @@ package view;
 
 import Controller.KeyHandler;
 import Model.Model;
+import Model.Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -93,12 +94,12 @@ public class GamePannel extends JPanel implements Runnable{
                 int i;
                 Model.getInstance().tileManager.draw(g2);
 
-                for(KeyHandler ii : Model.getInstance().keyHList) {
+                for(Player ii : Model.getInstance().playerList) {
 
-                    ii.player.draw(g2);
+                    ii.draw(g2);
 
-                    if(ii.player.displayHitbox){
-                        ii.player.drawHitbox(g2);
+                    if(ii.displayHitbox){
+                        ii.drawHitbox(g2);
                     }
 
                 }

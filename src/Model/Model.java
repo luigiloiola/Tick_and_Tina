@@ -15,9 +15,9 @@ public class Model implements Runnable {
     final int scale = 3;
 
     public final int size = originalSize * scale;
-    final double tickRate = 144;
+    public final int tickRate = 144;
 
-    public ArrayList<KeyHandler> keyHList;
+    public ArrayList<Player> playerList;
 
     private static volatile Model INSTANCE = null;
 
@@ -29,7 +29,7 @@ public class Model implements Runnable {
 
     private Model() {
         modelThread = new Thread(this);
-        keyHList = new ArrayList<>();
+        playerList = new ArrayList<>();
         gameState = 0;
 
         cChecker = new CollisionChecker(this);
@@ -73,8 +73,8 @@ public class Model implements Runnable {
         return INSTANCE;
     } 
 
-    public void addKeyHandler(KeyHandler keyH) {
-        keyHList.add(keyH);
+    public void addPlayer(Player player) {
+        playerList.add(player);
     }
 
 
@@ -111,9 +111,9 @@ public class Model implements Runnable {
 
         try {
 
-            for(KeyHandler i: Model.getInstance().keyHList) {
-                cChecker.check(i.player);
-                i.player.routine();
+            for(Player i: Model.getInstance().playerList) {
+                cChecker.check(i);
+                i.routine();
                 }
 
         } catch (Exception e) {

@@ -3,10 +3,14 @@ package Main;
 
 import Controller.KeyHandler;
 import Model.Model;
+import Model.characteres.ShotgunGuy;
+import Model.characteres.TheBloodKing;
 import view.GamePannel;
+import Model.Player;
 
 import javax.swing.*;
 import java.security.Key;
+
 
 public class Main {
     public static void main(String[] args) {
@@ -16,7 +20,9 @@ public class Main {
         window.setTitle("game");
 
         KeyHandler keyH1 = new KeyHandler();
+        Player player1 = new Player(new ShotgunGuy(keyH1.gamePannel, keyH1));
 //        KeyHandler keyH2 = new KeyHandler();
+        Model.getInstance().addPlayer(player1);
         Model.getInstance().modelThread.start();
         window.add(keyH1.gamePannel);
 

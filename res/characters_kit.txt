@@ -1,0 +1,9 @@
+bullet guy kit:
+auto:shoot bullet
+skill: dash avoiding damage
+charge: charges a shot that increases the number of bullets based on the time charged
+
+the blood king:
+auto: slash foward
+skill: dodges, and then reflects projectiles to the enemy direction
+charge: command grab
