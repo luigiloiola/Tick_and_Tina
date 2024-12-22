@@ -2,12 +2,13 @@ package Model.characteres;
 
 import Controller.KeyHandler;
 import Model.Character;
+import Model.Player;
 import view.GamePannel;
 
 public class TheBloodKing extends Character {
 
-    public TheBloodKing(GamePannel gamePannel, KeyHandler keyH) {
-        super(gamePannel, keyH);
+    public TheBloodKing(Player player) {
+        super(player);
         this.imageFolderPath = "theBloodKing";
     }
 
@@ -24,9 +25,5 @@ public class TheBloodKing extends Character {
 
     }
 
-    @Override
-    public void draw(){
-
-    }
 
 }

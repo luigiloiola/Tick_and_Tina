@@ -12,7 +12,7 @@ public class Model implements Runnable {
     public int gameState;
 
     final int originalSize = 16;
-    final int scale = 3;
+    public final int scale = 3;
 
     public final int size = originalSize * scale;
     public final int tickRate = 144;
@@ -71,7 +71,7 @@ public class Model implements Runnable {
             }
         }
         return INSTANCE;
-    } 
+    }
 
     public void addPlayer(Player player) {
         playerList.add(player);

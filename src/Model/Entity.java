@@ -8,6 +8,7 @@ public class Entity {
 
     public int width;
     public int height;
+    public int baseVelocityX = 2;
     public int velocityX;
 
     public double velocityY;

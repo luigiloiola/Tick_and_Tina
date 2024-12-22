@@ -18,7 +18,13 @@ public class Player extends Entity{
 
     int runningFrame, idleFrame, jumpFrame, jumpToFallFrame, fallFrame, skillFrame = 0;
 
-    BufferedImage[] runningImages,runningImagesReversed, idleImages, jumpImages, jumpToFallImages, fallImages, skillImages;
+
+
+    BufferedImage[] runningImages, idleImages, jumpImages, jumpToFallImages, fallImages, skillImages;
+    boolean runningR, runningL;
+    Map<String, HashMap<String, BufferedImage[]>> characterImages = new HashMap<>();
+    public enum directions {LEFT, RIGHT}
+    public directions direction = directions.LEFT;
 
     public boolean displayHitbox;
 
@@ -39,22 +45,19 @@ public class Player extends Entity{
     GamePannel gamePannel;
     KeyHandler keyH;
 
-    Character character;
+    public Character character;
 
     //TODO: everything Player class is doing, should be done by Character class
 
-    public Player(Character character) {
-        this.character = character;
-        this.gamePannel = character.gamePannel;
-        this.keyH = character.keyH;
+    public Player(GamePannel gamePannel, KeyHandler keyH) {
+        this.gamePannel = gamePannel;
+        this.keyH = keyH;
         System.out.println("player created");
         this.playerId = lastPlayerId;
         lastPlayerId +=1;
         this.height = Model.getInstance().size;
         this.width = Model.getInstance().size;
-        this.posX = character.posX;
-        this.posY = character.posY;
-        this.velocityX = 2;
+        this.baseVelocityX = 2;
         this.velocityY = -0.1;
         this.cooldowns.put("cooldown", 0);
         this.animating = false;
@@ -63,19 +66,37 @@ public class Player extends Entity{
         this.runningFrame=0;
         this.idleFrame = 0;
         this.dodgeAvaliable = true;
-        getEntityImage();
-
     }
 
 
-    public void getEntityImage() {
+    public void getEntityImage(String pathName) {
 
-        runningImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/run");
-        idleImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/idle");
-        jumpImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/jump");
-        jumpToFallImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/jumpToFall");
-        fallImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/fall");
-        skillImages = FileManager.getImagesFiles("res/" + character.imageFolderPath + "/skill");
+        characterImages.put("left", new HashMap<>());
+        characterImages.put("right", new HashMap<>());
+
+        characterImages.get("right").put("run", FileManager.getImagesFiles("res/" + pathName + "/run"));
+        characterImages.get("right").put("idle", FileManager.getImagesFiles("res/" + pathName + "/idle"));
+        characterImages.get("right").put("jump", FileManager.getImagesFiles("res/" + pathName + "/jump"));
+        characterImages.get("right").put("jumpToFall", FileManager.getImagesFiles("res/" + pathName + "/jumpToFall"));
+        characterImages.get("right").put("fall", FileManager.getImagesFiles("res/" + pathName + "/fall"));
+        characterImages.get("right").put("skill", FileManager.getImagesFiles("res/" + pathName + "/skill"));
+
+        characterImages.get("left").put("run", FileManager.reverseImageArray(characterImages.get("right").get("run")));
+        characterImages.get("left").put("idle", FileManager.reverseImageArray(characterImages.get("right").get("idle")));
+        characterImages.get("left").put("jump", FileManager.reverseImageArray(characterImages.get("right").get("jump")));
+        characterImages.get("left").put("jumpToFall", FileManager.reverseImageArray(characterImages.get("right").get("jumpToFall")));
+        characterImages.get("left").put("fall", FileManager.reverseImageArray(characterImages.get("right").get("fall")));
+        characterImages.get("left").put("skill", FileManager.reverseImageArray(characterImages.get("right").get("skill")));
+
+        idleImages = characterImages.get("left").get("idle");
+        System.out.println(characterImages);
+
+
+    }
+
+    public void selectCharacter(Character character){
+        this.character = character;
+        getEntityImage(character.imageFolderPath);
     }
 
 
@@ -93,20 +114,37 @@ public class Player extends Entity{
     }
     public void draw (Graphics2D g2) {
         BufferedImage image;
-        image = idleImages[0];
+        image = characterImages.get("right").get("idle")[0];
 
 
 //        multiplying and then dividing it back after the increment, makes so that the animation spends more time in each frame
 
-        if (keyH.devTools) {
-            displayHitbox = true;
+        displayHitbox = keyH.devTools;
+
+        if(velocityX > 0) {
+            direction = directions.RIGHT;
+            runningImages = characterImages.get("right").get("run");
+            idleImages = characterImages.get("right").get("idle");
+            jumpImages = characterImages.get("right").get("jump");
+            jumpToFallImages = characterImages.get("right").get("jumpToFall");
+            fallImages = characterImages.get("right").get("fall");
+            skillImages = characterImages.get("right").get("skill");
+        }
+        else if(velocityX < 0) {
+            direction = directions.LEFT;
+            runningImages = characterImages.get("left").get("run");
+            idleImages = characterImages.get("left").get("idle");
+            jumpImages = characterImages.get("left").get("jump");
+            jumpToFallImages = characterImages.get("left").get("jumpToFall");
+            fallImages = characterImages.get("left").get("fall");
+            skillImages = characterImages.get("left").get("skill");
         }
 
         if(skill) {
-            if(skillFrame != (int)(skillImages.length* character.skillAnimamationFramesPerStep)){
+            if(skillFrame != (skillImages.length * character.skillAnimamationFramesPerStep)){
                 image= skillImages[(int) (skillFrame / character.skillAnimamationFramesPerStep)];
                 skillFrame ++;
-                if(skillFrame == (int) (skillImages.length* character.skillAnimamationFramesPerStep)-2) animating = false;
+                if(skillFrame == (int) (skillImages.length* character.skillAnimamationFramesPerStep)) animating = false;
 
 
             }else{
@@ -140,71 +178,79 @@ public class Player extends Entity{
                     fallFrame++;
             }
         }
-        else if(keyH.leftPressed && !keyH.rightPressed) {
+        else if(velocityX != 0) {
 
             if(runningFrame == (int) (runningImages.length * gamePannel.animationFrameDuration)){
                 runningFrame = 0;
             }
-            image = runningImagesReversed[(int)(runningFrame / gamePannel.animationFrameDuration)];
-            runningFrame++;
-
-        }
-        else if(keyH.rightPressed && !keyH.leftPressed) {
-
-            if(runningFrame == (int) (runningImages.length * gamePannel.animationFrameDuration)){
-                runningFrame = 0;
-            }
-            image = runningImages[(int)(runningFrame/ gamePannel.animationFrameDuration)];
+            image = runningImages[(int)(runningFrame / gamePannel.animationFrameDuration)];
             runningFrame++;
 
         }
         else {
-//            if(idleFrame ==  (int) (idleImages.length * gamePannel.animationFrameDuration)) {
-//                idleFrame = 0;
-//            }
+            if(idleFrame ==  (int) (idleImages.length * gamePannel.animationFrameDuration)) {
+                idleFrame = 0;
+            }
             image = idleImages[(int) (idleFrame /gamePannel.animationFrameDuration)];
-//            idleFrame++;
+            idleFrame++;
         }
 //        TODO: colocar posX e posY em função do image.getWidht() e image.getHieght()
-        g2.drawImage(image, tempPosX-image.getWidth(), posY-height, image.getWidth()*Model.getInstance().scale, image.getHeight()*3, null);
+        if(direction == directions.RIGHT) g2.drawImage(image, tempPosX-width, posY-height/2, image.getWidth()*Model.getInstance().scale, image.getHeight()*Model.getInstance().scale, null);
+        else g2.drawImage(image, (tempPosX-(image.getWidth()*Model.getInstance().scale)+width*Model.getInstance().scale/2), posY-height/2, image.getWidth()*Model.getInstance().scale, image.getHeight()*Model.getInstance().scale, null);
     }
 
     public void routine() {
+        if(keyH.devTools){
+            if(!(posX == tempPosX)){
+                System.out.println(posX);
+            }
+        }
         if(!animating){
             tempPosX = posX;
 
+            if(!colliding[3] && velocityX > 0) posX += velocityX;
+            if(!colliding[2] && velocityX < 0) posX += velocityX;
+
             if(!colliding[1]) {
-                posY += velocityY;
+                posY += (int)velocityY;
                 velocityY+=0.12;
             }else{
                 jumpCount = 2;
                 dodgeAvaliable = true;
                 velocityY = 0.12;
             }
+
             if (keyH.upPressed && !jumpCooldown) {
                 velocityY = jumpForce;
                 if(!colliding[0]){
                     jumpCooldown = true;
                     jumpCount--;
                 }
+            }
+            if(!keyH.upPressed){
+                jumpCooldown = false;
+            }
 
+            if(keyH.leftPressed){
+                velocityX = -baseVelocityX;
+                runningL = true;
             }
-            if(keyH.leftPressed) {
-                if(velocityX > 0){
-                    velocityX = velocityX * -1;
-                }
-                if(!colliding[2]){
-                    posX += velocityX;
-                }
+
+            if(!keyH.leftPressed && runningL){
+                velocityX = 0;
+                runningL = false;
             }
-            if(keyH.rightPressed) {
-                if(velocityX < 0){
-                    velocityX = velocityX * -1;
-                }
-                if(!colliding[3]){
-                    posX += velocityX;
-                }
+
+            if(keyH.rightPressed){
+                velocityX = baseVelocityX;
+                runningR = true;
             }
+
+            if (!keyH.rightPressed && runningR){
+                velocityX = 0;
+                runningR = false;
+            }
+
             if(keyH.shiftPressed && dodgeAvaliable) {
                 skill = true;
                 animating = true;

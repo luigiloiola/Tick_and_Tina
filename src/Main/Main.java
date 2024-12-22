@@ -20,10 +20,9 @@ public class Main {
         window.setTitle("game");
 
         KeyHandler keyH1 = new KeyHandler();
-        Player player1 = new Player(new ShotgunGuy(keyH1.gamePannel, keyH1));
-//        KeyHandler keyH2 = new KeyHandler();
+        Player player1 = new Player(keyH1.gamePannel, keyH1);
+        player1.selectCharacter(new ShotgunGuy(player1));
         Model.getInstance().addPlayer(player1);
-        Model.getInstance().modelThread.start();
         window.add(keyH1.gamePannel);
 
         window.pack();
@@ -32,6 +31,13 @@ public class Main {
 
         window.setLocationRelativeTo(null);
         window.setVisible(true);
+
+
+
+//        KeyHandler keyH2 = new KeyHandler();
+//        Player player2 = new Player(keyH2.gamePannel, keyH2);
+//        player2.selectCharacter(new TheBloodKing(player2));
+//        Model.getInstance().addPlayer(player2);
 //
 //        JFrame window2 = new JFrame();
 //        window2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,6 +53,8 @@ public class Main {
 //
 //        window2.setLocationRelativeTo(null);
 //        window2.setVisible(true);
+//
+        Model.getInstance().modelThread.start();
 //
     }
 }
