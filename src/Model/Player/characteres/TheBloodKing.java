@@ -1,9 +1,7 @@
-package Model.characteres;
+package Model.Player.characteres;
 
-import Controller.KeyHandler;
-import Model.Character;
-import Model.Player;
-import view.GamePannel;
+import Model.Player.Character;
+import Model.Player.Player;
 
 public class TheBloodKing extends Character {
 

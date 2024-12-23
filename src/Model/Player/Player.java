@@ -1,6 +1,10 @@
-package Model;
+package Model.Player;
 
 import Controller.KeyHandler;
+import Model.Entity;
+import Model.Model;
+import Model.Player.Character;
+import Model.FileManager;
 import view.GamePannel;
 
 import java.awt.*;
@@ -8,7 +12,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Player extends Entity{
+public class Player extends Entity {
 
 
     public boolean down, left, right, up, basic, charge, skill = false;
@@ -41,6 +45,7 @@ public class Player extends Entity{
 
     public boolean jumpCooldown = false;
     private final Map<String, Integer> cooldowns = new HashMap<>();
+    public boolean gliding;
 
     GamePannel gamePannel;
     KeyHandler keyH;
@@ -89,6 +94,12 @@ public class Player extends Entity{
         characterImages.get("left").put("skill", FileManager.reverseImageArray(characterImages.get("right").get("skill")));
 
         idleImages = characterImages.get("left").get("idle");
+        runningImages = characterImages.get("left").get("run");
+        jumpImages = characterImages.get("left").get("jump");
+        jumpToFallImages = characterImages.get("left").get("jumpToFall");
+        fallImages = characterImages.get("left").get("fall");
+        skillImages = characterImages.get("left").get("skill");
+
         System.out.println(characterImages);
 
 
@@ -201,6 +212,7 @@ public class Player extends Entity{
 
     public void routine() {
         if(keyH.devTools){
+            System.out.println(gliding);
             if(!(posX == tempPosX)){
                 System.out.println(posX);
             }
@@ -210,24 +222,27 @@ public class Player extends Entity{
 
             if(!colliding[3] && velocityX > 0) posX += velocityX;
             if(!colliding[2] && velocityX < 0) posX += velocityX;
-
+            if(gliding  && velocityY > 2) accelerationY = 0;
+            else accelerationY = 0.12;
             if(!colliding[1]) {
                 posY += (int)velocityY;
-                velocityY+=0.12;
+                velocityY+=accelerationY;
             }else{
                 jumpCount = 2;
                 dodgeAvaliable = true;
-                velocityY = 0.12;
+                velocityY = accelerationY;
             }
 
-            if (keyH.upPressed && !jumpCooldown) {
-                velocityY = jumpForce;
-                if(!colliding[0]){
+            if (keyH.upPressed) {
+                gliding = true;
+                if(!jumpCooldown && jumpCount > 0){
+                    velocityY = jumpForce;
                     jumpCooldown = true;
                     jumpCount--;
                 }
             }
             if(!keyH.upPressed){
+                gliding = false;
                 jumpCooldown = false;
             }
 

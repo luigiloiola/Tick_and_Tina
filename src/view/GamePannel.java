@@ -2,7 +2,7 @@ package view;
 
 import Controller.KeyHandler;
 import Model.Model;
-import Model.Player;
+import Model.Player.Player;
 
 import javax.swing.*;
 import java.awt.*;

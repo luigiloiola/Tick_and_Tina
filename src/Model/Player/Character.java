@@ -1,7 +1,9 @@
-package Model;
+package Model.Player;
 
 import Controller.KeyHandler;
+import Model.Model;
 import view.GamePannel;
+import Model.FileManager;
 
 public abstract class Character {
 
@@ -31,9 +33,11 @@ public abstract class Character {
     public abstract void charge();
 
     public double getAnimationFramesPerStep(String pathName, double animationDuration){
-        System.out.println((int)((Model.getInstance().tickRate * animationDuration / FileManager.getFolderLength(pathName))));
-        System.out.println(((Model.getInstance().tickRate * animationDuration / FileManager.getFolderLength(pathName))));
         return ((Model.getInstance().tickRate * animationDuration / FileManager.getFolderLength(pathName)));
+    }
+
+    public void checkForAnimationEnd(){
+
     }
 
 }

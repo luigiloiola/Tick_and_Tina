@@ -3,13 +3,11 @@ package Main;
 
 import Controller.KeyHandler;
 import Model.Model;
-import Model.characteres.ShotgunGuy;
-import Model.characteres.TheBloodKing;
-import view.GamePannel;
-import Model.Player;
+import Model.Player.characteres.ShotgunGuy;
+import Model.Player.characteres.TheBloodKing;
+import Model.Player.Player;
 
 import javax.swing.*;
-import java.security.Key;
 
 
 public class Main {
@@ -34,25 +32,24 @@ public class Main {
 
 
 
-//        KeyHandler keyH2 = new KeyHandler();
-//        Player player2 = new Player(keyH2.gamePannel, keyH2);
-//        player2.selectCharacter(new TheBloodKing(player2));
-//        Model.getInstance().addPlayer(player2);
-//
-//        JFrame window2 = new JFrame();
-//        window2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        window2.setResizable(false);
-//        window2.setTitle("game");
-//
-//
-//        window2.add(keyH2.gamePannel);
-//
-//        window2.pack();
-//
-//
-//
-//        window2.setLocationRelativeTo(null);
-//        window2.setVisible(true);
+        KeyHandler keyH2 = new KeyHandler();
+        Player player2 = new Player(keyH2.gamePannel, keyH2);
+        player2.selectCharacter(new TheBloodKing(player2));
+        Model.getInstance().addPlayer(player2);
+
+        JFrame window2 = new JFrame();
+        window2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window2.setResizable(false);
+        window2.setTitle("game");
+
+
+        window2.add(keyH2.gamePannel);
+
+        window2.pack();
+
+
+        window2.setLocationRelativeTo(null);
+        window2.setVisible(true);
 //
         Model.getInstance().modelThread.start();
 //

@@ -1,11 +1,9 @@
-package Model.characteres;
+package Model.Player.characteres;
 
-import Controller.KeyHandler;
-import Model.Character;
+import Model.Player.Character;
 import Model.Model;
-import view.GamePannel;
 import Model.FileManager;
-import Model.Player;
+import Model.Player.Player;
 
 public class ShotgunGuy extends Character {
 

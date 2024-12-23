@@ -1,6 +1,6 @@
 package Model;
 
-import Controller.KeyHandler;
+import Model.Player.Player;
 import view.GamePannel;
 
 import java.util.ArrayList;
