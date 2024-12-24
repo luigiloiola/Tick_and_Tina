@@ -3,8 +3,8 @@ package Main;
 
 import Controller.KeyHandler;
 import Model.Model;
-import Model.Player.characteres.ShotgunGuy;
-import Model.Player.characteres.TheBloodKing;
+import Model.Player.characteres.ShotgunGuy.ShotgunGuy;
+import Model.Player.characteres.TheBloodKing.TheBloodKing;
 import Model.Player.Player;
 
 import javax.swing.*;

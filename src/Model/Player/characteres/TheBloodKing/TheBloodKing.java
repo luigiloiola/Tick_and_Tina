@@ -1,4 +1,4 @@
-package Model.Player.characteres;
+package Model.Player.characteres.TheBloodKing;
 
 import Model.Player.Character;
 import Model.Player.Player;
